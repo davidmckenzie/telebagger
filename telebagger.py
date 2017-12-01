@@ -41,9 +41,10 @@ def callback(update):
             print(update)
             print("Channel ID: {}".format(update.message.to_id.channel_id))
             if update.message.to_id.channel_id == channel_id:
-                msgText = "*{}*: @everyone {}".format(channel_name, update.message.message)
-                msg = Webhook(url,msg=update.message.message)
-                msg.post()
+                if not update.message.message == '':
+                    msgText = "*{}*: @everyone {}".format(channel_name, update.message.message)
+                    msg = Webhook(url,msg=msgText)
+                    msg.post()
             else:
                 logger.info('ignoring message to wrong channel')
         except:
