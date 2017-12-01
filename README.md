@@ -15,5 +15,10 @@ Then copy config.example.json and set the fields accordingly.
 
 Once config is set up, simply run:
 ```
-python telebagger.py
+python3 telebagger.py
+```
+
+For autorestarts, use pm2:
+```
+pm2 start telebagger.py --interpreter=python3
 ```
