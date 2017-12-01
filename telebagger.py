@@ -39,15 +39,14 @@ def callback(update):
     if type(update) is UpdateNewChannelMessage:
         try:
             logger.debug(update)
-            logger.debug("Message from Channel ID: {}".format(update.message.to_id.channel_id))
             if update.message.to_id.channel_id == channel_id:
-                logger.info("Message from Channel ID: {}".format(update.message.to_id.channel_id))
+                logger.info("Relaying Message from Channel ID: {}".format(update.message.to_id.channel_id))
                 if not update.message.message == '':
                     msgText = "*{}*: @everyone {}".format(channel_name, update.message.message)
                     msg = Webhook(url,msg=msgText)
                     msg.post()
             else:
-                logger.debug('ignoring message to wrong channel')
+                logger.info("Ignoring Message from Channel ID: {}".format(update.message.to_id.channel_id))
         except:
             logger.debug('no message')
 
