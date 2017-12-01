@@ -39,16 +39,17 @@ def callback(update):
     if type(update) is UpdateNewChannelMessage:
         try:
             logger.debug(update)
-            logger.info("Message from Channel ID: {}".format(update.message.to_id.channel_id))
+            logger.debug("Message from Channel ID: {}".format(update.message.to_id.channel_id))
             if update.message.to_id.channel_id == channel_id:
+                logger.info("Message from Channel ID: {}".format(update.message.to_id.channel_id))
                 if not update.message.message == '':
                     msgText = "*{}*: @everyone {}".format(channel_name, update.message.message)
                     msg = Webhook(url,msg=msgText)
                     msg.post()
             else:
-                logger.info('ignoring message to wrong channel')
+                logger.debug('ignoring message to wrong channel')
         except:
-            logger.info('no message')
+            logger.debug('no message')
 
 #msg = Webhook(url,msg="Telebagger ready to bag yo telegrams")
 #msg.post()
