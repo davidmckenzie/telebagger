@@ -1,0 +1,14 @@
+{
+    "discord":{
+        "_comment":"Second parameter is unused - if switching between multiple channels when testing, the one named 'url' will be used",
+        "url":"https://discordapp.com/api/webhooks/x/y",
+        "_prod_url":"https://discordapp.com/api/webhooks/x/y"
+    },
+    "telegram":{
+        "_comment":"Channel ID can be obtained by running the script with a dummy value, then picking from the list of available channels",
+        "api_id":1234,
+        "api_hash":"124325",
+        "phone":"+61420000000",
+        "channel_id":1234
+    }
+}

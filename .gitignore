@@ -99,3 +99,7 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# telebagger specific
+session_name.session
+config.json
