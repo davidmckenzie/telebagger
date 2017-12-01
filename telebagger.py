@@ -11,7 +11,8 @@ from telethon.tl.types import UpdateShortMessage, UpdateNewChannelMessage, PeerU
 from time import sleep
 import json
 import logging
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('telebagger')
 
 with open('config.json') as config_file:
@@ -40,7 +41,7 @@ def callback(update):
             print(update)
             print("Channel ID: {}".format(update.message.to_id.channel_id))
             if update.message.to_id.channel_id == channel_id:
-                msgText = "*{}*: {}".format(channel_name, update.message.message)
+                msgText = "*{}*: @everyone {}".format(channel_name, update.message.message)
                 msg = Webhook(url,msg=update.message.message)
                 msg.post()
             else:
