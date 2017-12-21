@@ -82,7 +82,7 @@ try:
 except:
     logger.error("Whoops! Couldn't find channel ID '{}'".format(channel_id))
 
-differences = client(GetChannelDifferenceRequest( channel=client.get_input_entity(PeerChannel(channel_id)), filter=ChannelMessagesFilterEmpty(), pts=53742, limit=1000 )) # type: ChannelDifference
+differences = tclient(GetChannelDifferenceRequest( channel=tclient.get_input_entity(PeerChannel(channel_id)), filter=ChannelMessagesFilterEmpty(), pts=53742, limit=1000 )) # type: ChannelDifference
 logger.debug(differences)
 
 tclient.idle()
