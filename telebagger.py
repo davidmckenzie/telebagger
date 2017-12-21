@@ -6,7 +6,7 @@
 
 from discord_hooks import Webhook
 from telethon import TelegramClient
-from telethon.tl.functions.messages import GetDialogsRequest
+from telethon.tl.functions.messages import GetDialogsRequest, GetChannelDifferenceRequest
 from telethon.tl.types import UpdateShortMessage, UpdateNewChannelMessage, PeerUser, PeerChat, PeerChannel, InputPeerEmpty, Channel
 from time import sleep
 import json
