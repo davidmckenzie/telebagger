@@ -1,6 +1,6 @@
 ######
 #
-# Telebagger - Simple Telegram to Discord relay service
+# Telelooper - Simple Telegram to Discord relay service, but this one loops once a second
 #
 ######
 
@@ -16,7 +16,6 @@ import logging
 #logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s', datefmt='%m-%d %H:%M')
 logger = logging.getLogger('telebagger')
-lastmessage = 0
 
 with open('config.json') as config_file:
     config = json.load(config_file)
@@ -48,6 +47,9 @@ def callback(update):
             logger.debug(update)
             if update.message.to_id.channel_id == channel_id:
                 logger.info("Relaying Message from Channel ID: {}".format(update.message.to_id.channel_id))
+                if update.message.id > lastmessage:
+                    lastmessage = update.message.id
+                    logger.debug("Last message is now "+str(lastmessage))
                 if not update.message.message == '':
                     if everyone:
                         msgText = "*{}*: @everyone {}".format(channel_name, update.message.message)
@@ -65,8 +67,9 @@ def callback(update):
 #msg = Webhook(url,msg="Telebagger ready to bag yo telegrams")
 #msg.post()
 
-tclient.add_update_handler(callback)
+#tclient.add_update_handler(callback)
 
+lastmessage = 0
 last_date = None
 chunk_size = 20
 result = tclient(GetDialogsRequest(
@@ -82,12 +85,14 @@ for p in result.chats:
         if p.id == channel_id:
             channel_name = p.title
 
+channelEnt = tclient.get_input_entity(PeerChannel(channel_id))
+
 try:
     logger.info("\nListening for messages from channel '{}' with ID '{}'".format(channel_name,channel_id))
 except:
     logger.error("Whoops! Couldn't find channel ID '{}'".format(channel_id))
 
-full_channel = tclient(GetHistoryRequest(peer=tclient.get_input_entity(PeerChannel(channel_id)),
+history = tclient(GetHistoryRequest(peer=channelEnt,
                                             offset_date=last_date,
                                             offset_id=0,
                                             add_offset=0,
@@ -95,13 +100,41 @@ full_channel = tclient(GetHistoryRequest(peer=tclient.get_input_entity(PeerChann
                                             max_id=0,
                                             min_id=0
                                         ))
-full_channel.messages.reverse()
+history.messages.reverse()
 logger.info("\nLast 10 Messages:\n")
-for m in full_channel.messages:
+for m in history.messages:
     datetime = m.date.strftime('%Y-%m-%d %H:%M:%S')
-    logger.info(datetime+" "+str(m.id)+": "+m.message)
+    try:
+        logger.info(datetime+" "+str(m.id)+": "+m.message)
+    except:
+        continue
     if m.id > lastmessage:
         lastmessage = m.id
 
-tclient.idle()
+while True:
+    try:
+        messages = tclient(GetHistoryRequest(peer=channelEnt,
+                                            offset_date=last_date,
+                                            offset_id=0,
+                                            add_offset=0,
+                                            limit=50,
+                                            max_id=0,
+                                            min_id=lastmessage
+                                        ))
+        if len(messages.messages) > 0:
+            logger.debug('New Messages: ')
+            logger.debug(messages)
+            for m in messages.messages:
+                datetime = m.date.strftime('%Y-%m-%d %H:%M:%S')
+                if m.id > lastmessage:
+                    lastmessage = m.id
+                try:
+                    logger.info(datetime+" "+str(m.id)+": "+m.message)
+                except:
+                    logger.debug(m)
+        sleep(2)
+        continue
+    except KeyboardInterrupt:
+        break
+
 tclient.disconnect()
