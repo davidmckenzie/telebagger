@@ -6,14 +6,17 @@
 
 from discord_hooks import Webhook
 from telethon import TelegramClient
-from telethon.tl.functions.messages import GetDialogsRequest, GetChannelDifferenceRequest
-from telethon.tl.types import UpdateShortMessage, UpdateNewChannelMessage, PeerUser, PeerChat, PeerChannel, InputPeerEmpty, Channel
+from telethon.tl.functions.messages import GetDialogsRequest, GetHistoryRequest
+from telethon.tl.functions.channels import GetFullChannelRequest
+from telethon.tl.functions.updates import GetChannelDifferenceRequest
+from telethon.tl.types import UpdateShortMessage, UpdateNewChannelMessage, PeerUser, PeerChat, PeerChannel, InputPeerEmpty, Channel, ChannelMessagesFilter, ChannelMessagesFilterEmpty
 from time import sleep
 import json
 import logging
 #logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s', datefmt='%m-%d %H:%M')
 logger = logging.getLogger('telebagger')
+lastmessage = 0
 
 with open('config.json') as config_file:
     config = json.load(config_file)
@@ -45,6 +48,9 @@ def callback(update):
             logger.debug(update)
             if update.message.to_id.channel_id == channel_id:
                 logger.info("Relaying Message from Channel ID: {}".format(update.message.to_id.channel_id))
+                if update.message.id > lastmessage:
+                    lastmessage = update.message.id
+                    logger.debug("Last message is now "+str(lastmessage))
                 if not update.message.message == '':
                     if everyone:
                         msgText = "*{}*: @everyone {}".format(channel_name, update.message.message)
@@ -52,6 +58,8 @@ def callback(update):
                         msgText = "*{}*: {}".format(channel_name, update.message.message)
                     msg = Webhook(url,msg=msgText)
                     msg.post()
+                else:
+                    logger.debug('ignoring empty message: {}'.format(update.message))
             else:
                 logger.info("Ignoring Message from Channel ID: {}".format(update.message.to_id.channel_id))
         except:
@@ -82,8 +90,21 @@ try:
 except:
     logger.error("Whoops! Couldn't find channel ID '{}'".format(channel_id))
 
-differences = tclient(GetChannelDifferenceRequest( channel=tclient.get_input_entity(PeerChannel(channel_id)), filter=ChannelMessagesFilterEmpty(), pts=53742, limit=1000 )) # type: ChannelDifference
-logger.debug(differences)
+full_channel = tclient(GetHistoryRequest(peer=tclient.get_input_entity(PeerChannel(channel_id)),
+                                            offset_date=last_date,
+                                            offset_id=0,
+                                            add_offset=0,
+                                            limit=10,
+                                            max_id=0,
+                                            min_id=0
+                                        ))
+
+logger.info("\nLast 10 Messages:\n")
+for m in full_channel.messages:
+    datetime = m.date.strftime('%Y-%m-%d %H:%M:%S')
+    logger.info(datetime+" "+str(m.id)+": "+m.message)
+    if m.id > lastmessage:
+        lastmessage = m.id
 
 tclient.idle()
 tclient.disconnect()
