@@ -7,12 +7,12 @@
 from discord_hooks import Webhook
 from telethon import TelegramClient
 from telethon.tl.functions.messages import GetDialogsRequest
-from telethon.tl.types import UpdateShortMessage, UpdateNewChannelMessage, PeerUser, PeerChat, PeerChannel, InputPeerEmpty, Channel
+from telethon.tl.types import UpdateShortMessage, UpdateNewChannelMessage, PeerUser, PeerChat, PeerChannel, InputPeerEmpty, Channel, ChannelDifference
 from time import sleep
 import json
 import logging
 #logging.basicConfig(level=logging.DEBUG)
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s', datefmt='%m-%d %H:%M')
 logger = logging.getLogger('telebagger')
 
 with open('config.json') as config_file:
@@ -24,8 +24,12 @@ try:
     api_hash = config['telegram']['api_hash']
     phone = config['telegram']['phone']
     channel_id = config['telegram']['channel_id']
+    everyone = config['telegram']['everyone']
+    loglevel = config['telegram']['loglevel']
 except:
     logger.error('Error processing config file')
+
+logger.setLevel(loglevel)
 
 print('Connecting to Telegram...')
 
@@ -42,7 +46,10 @@ def callback(update):
             if update.message.to_id.channel_id == channel_id:
                 logger.info("Relaying Message from Channel ID: {}".format(update.message.to_id.channel_id))
                 if not update.message.message == '':
-                    msgText = "*{}*: @everyone {}".format(channel_name, update.message.message)
+                    if everyone:
+                        msgText = "*{}*: @everyone {}".format(channel_name, update.message.message)
+                    else:
+                        msgText = "*{}*: {}".format(channel_name, update.message.message)
                     msg = Webhook(url,msg=msgText)
                     msg.post()
             else:
@@ -74,6 +81,9 @@ try:
     logger.info("\nListening for messages from channel '{}' with ID '{}'".format(channel_name,channel_id))
 except:
     logger.error("Whoops! Couldn't find channel ID '{}'".format(channel_id))
+
+differences = client(GetChannelDifferenceRequest( channel=client.get_input_entity(PeerChannel(channel_id)), filter=ChannelMessagesFilterEmpty(), pts=53742, limit=1000 )) # type: ChannelDifference
+logger.debug(differences)
 
 tclient.idle()
 tclient.disconnect()

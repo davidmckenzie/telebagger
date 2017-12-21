@@ -9,6 +9,8 @@
         "api_id":1234,
         "api_hash":"124325",
         "phone":"+61420000000",
-        "channel_id":1234
+        "everyone":true,
+        "channel_id":1234,
+        "loglevel": "DEBUG"
     }
 }
