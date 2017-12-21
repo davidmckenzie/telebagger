@@ -98,7 +98,7 @@ full_channel = tclient(GetHistoryRequest(peer=tclient.get_input_entity(PeerChann
                                             max_id=0,
                                             min_id=0
                                         ))
-full_channel.reverse()
+full_channel.messages.reverse()
 logger.info("\nLast 10 Messages:\n")
 for m in full_channel.messages:
     datetime = m.date.strftime('%Y-%m-%d %H:%M:%S')
