@@ -110,6 +110,17 @@ for m in history.messages:
         continue
     if m.id > lastmessage:
         lastmessage = m.id
+    try:
+        logger.info("Relaying Message {}".format(m.id))
+        if not m.message == '':
+            if everyone:
+                msgText = "@noteveryone {}".format(m.message)
+            else:
+                msgText = "{}".format(m.message)
+            msg = Webhook(url,msg=msgText)
+            msg.post()
+    except:
+        logger.info('Ignoring empty message {} action: {}'.format(m.id, m.action))
 
 while True:
     try:
@@ -128,6 +139,17 @@ while True:
                 datetime = m.date.strftime('%Y-%m-%d %H:%M:%S')
                 if m.id > lastmessage:
                     lastmessage = m.id
+                try:
+                    logger.info("Relaying Message {}".format(m.id))
+                    if not m.message == '':
+                        if everyone:
+                            msgText = "@everyone {}".format(m.message)
+                        else:
+                            msgText = "{}".format(m.message)
+                        msg = Webhook(url,msg=msgText)
+                        msg.post()
+                except:
+                    logger.info('Ignoring empty message {} action: {}'.format(m.id, m.action))
                 try:
                     logger.info(datetime+" "+str(m.id)+": "+m.message)
                 except:
