@@ -121,6 +121,10 @@ for m in history.messages:
             msg.post()
     except:
         logger.info('Ignoring empty message {} action: {}'.format(m.id, m.action))
+    try:
+        logger.info(datetime+" "+str(m.id)+": "+m.message)
+    except:
+        logger.debug(m)
 
 while True:
     try:
