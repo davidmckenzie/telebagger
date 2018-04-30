@@ -41,34 +41,6 @@ if not tclient.is_user_authorized():
     tclient.send_code_request(phone)
     myself = tclient.sign_in(phone, input('Enter code: '))
 
-def callback(update):
-    if type(update) is UpdateNewChannelMessage:
-        try:
-            logger.debug(update)
-            if update.message.to_id.channel_id == channel_id:
-                logger.info("Relaying Message from Channel ID: {}".format(update.message.to_id.channel_id))
-                if update.message.id > lastmessage:
-                    lastmessage = update.message.id
-                    logger.debug("Last message is now "+str(lastmessage))
-                if not update.message.message == '':
-                    if everyone:
-                        msgText = "*{}*: @everyone {}".format(channel_name, update.message.message)
-                    else:
-                        msgText = "*{}*: {}".format(channel_name, update.message.message)
-                    msg = Webhook(url,msg=msgText)
-                    msg.post()
-                else:
-                    logger.debug('ignoring empty message: {}'.format(update.message))
-            else:
-                logger.info("Ignoring Message from Channel ID: {}".format(update.message.to_id.channel_id))
-        except:
-            logger.debug('no message')
-
-#msg = Webhook(url,msg="Telebagger ready to bag yo telegrams")
-#msg.post()
-
-#tclient.add_update_handler(callback)
-
 lastmessage = 0
 last_date = None
 chunk_size = 20
@@ -117,8 +89,8 @@ for m in history.messages:
                 msgText = "@noteveryone {}".format(m.message)
             else:
                 msgText = "{}".format(m.message)
-            msg = Webhook(url,msg=msgText)
-            msg.post()
+            #msg = Webhook(url,msg=msgText)
+            #msg.post()
     except:
         logger.info('Ignoring empty message {} action: {}'.format(m.id, m.action))
     try:
