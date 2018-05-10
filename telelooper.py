@@ -70,7 +70,8 @@ history = tclient(GetHistoryRequest(peer=channelEnt,
                                             add_offset=0,
                                             limit=10,
                                             max_id=0,
-                                            min_id=0
+                                            min_id=0,
+                                            hash=0
                                         ))
 history.messages.reverse()
 logger.info("\nLast 10 Messages:\n")
@@ -106,7 +107,8 @@ while True:
                                             add_offset=0,
                                             limit=50,
                                             max_id=0,
-                                            min_id=lastmessage
+                                            min_id=lastmessage,
+                                            hash=0
                                         ))
         if len(messages.messages) > 0:
             logger.debug('New Messages: ')
