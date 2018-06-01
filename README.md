@@ -15,10 +15,14 @@ Then copy config.example.json and set the fields accordingly.
 
 Once config is set up, simply run:
 ```
-python3 telebagger.py
+python3 telelooper.py
 ```
 
 For autorestarts, use pm2:
 ```
-pm2 start telebagger.py --interpreter=python3
+pm2 start telelooper.py --interpreter=python3
 ```
+
+## Telelooper vs Telebagger
+
+Telelooper retrieves unread messages manually every few seconds, while Telebagger relies on Telethon's events. Telethon's events can be unreliable for supergroups, many missed messages can be expected. I would recommend using the telelooper.py script over the telebagger.py script unless you have a pressing need to use events.
