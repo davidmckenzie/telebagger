@@ -13,6 +13,8 @@ from telethon.tl.types import UpdateShortMessage, UpdateNewChannelMessage, PeerU
 from time import sleep
 import json
 import logging
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
 #logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s', datefmt='%m-%d %H:%M')
 logger = logging.getLogger('telebagger')
@@ -44,20 +46,35 @@ if not tclient.is_user_authorized():
 lastmessage = 0
 last_date = None
 chunk_size = 20
+chan_type = 'channel'
 result = tclient(GetDialogsRequest(
                  offset_date=last_date,
                  offset_id=0,
                  offset_peer=InputPeerEmpty(),
                  limit=chunk_size
              ))
+pp.pprint(result)
 print("\nAvailable Channels:")
 for p in result.chats:
     if type(p) is Channel:
         print(str(p.id)+": "+p.title)
         if p.id == channel_id:
             channel_name = p.title
+            print(p.stringify())
+            chan_type = 'channel'
+for u in result.users:
+    print(str(u.id)+": "+u.first_name)
+    if u.id == channel_id:
+        channel_name = u.first_name
+        print(u.stringify())
+        chan_type = 'user'
+# for d in result.dialogs:
+#     print(d.stringify())
 
-channelEnt = tclient.get_input_entity(PeerChannel(channel_id))
+if chan_type == 'channel':
+    channelEnt = tclient.get_input_entity(PeerChannel(channel_id))
+else:
+    channelEnt = tclient.get_input_entity(PeerUser(channel_id))
 
 try:
     logger.info("\nListening for messages from channel '{}' with ID '{}'".format(channel_name,channel_id))
