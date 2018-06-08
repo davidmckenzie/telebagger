@@ -106,16 +106,16 @@ for m in history.messages:
         logger.info("Relaying Message {}".format(m.id))
         media = m.media
         if media is not None:
-            logger.info("Will download image")
+            logger.info("Would download image")
             logger.debug(media)
-            download_res = tclient.download_media(
-                media, './downloads/')
-            logger.info("Download done: {}".format(download_res))
-            files = {'file': (open(download_res, 'rb'))}
-            response = requests.post(url, files=files)
-            logger.debug(response.text)
-            os.remove(download_res)
-            logger.debug("File deleted")
+            # download_res = tclient.download_media(
+            #     media, './downloads/')
+            # logger.info("Download done: {}".format(download_res))
+            # files = {'file': (open(download_res, 'rb'))}
+            # response = requests.post(url, files=files)
+            # logger.debug(response.text)
+            # os.remove(download_res)
+            # logger.debug("File deleted")
         if not m.message == '':
             if everyone:
                 msgText = "@noteveryone {}".format(m.message)
