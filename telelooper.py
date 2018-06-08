@@ -12,6 +12,8 @@ from telethon.tl.functions.updates import GetChannelDifferenceRequest
 from telethon.tl.types import UpdateShortMessage, UpdateNewChannelMessage, PeerUser, PeerChat, PeerChannel, InputPeerEmpty, Channel, ChannelMessagesFilter, ChannelMessagesFilterEmpty
 from time import sleep
 import json
+import os
+import requests
 import logging
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
@@ -102,6 +104,18 @@ for m in history.messages:
         lastmessage = m.id
     try:
         logger.info("Relaying Message {}".format(m.id))
+        media = m.media
+        if media is not None:
+            logger.info("Will download image")
+            logger.debug(media)
+            download_res = tclient.download_media(
+                media, './downloads/')
+            logger.info("Download done: {}".format(download_res))
+            files = {'file': (open(download_res, 'rb'))}
+            response = requests.post(url, files=files)
+            logger.debug(response.text)
+            os.remove(download_res)
+            logger.debug("File deleted")
         if not m.message == '':
             if everyone:
                 msgText = "@noteveryone {}".format(m.message)
@@ -136,6 +150,18 @@ while True:
                     lastmessage = m.id
                 try:
                     logger.info("Relaying Message {}".format(m.id))
+                    media = m.media
+                    if media is not None:
+                        logger.info("Will download image")
+                        logger.debug(media)
+                        download_res = tclient.download_media(
+                            media, './downloads/')
+                        logger.info("Download done: {}".format(download_res))
+                        files = {'file': (open(download_res, 'rb'))}
+                        response = requests.post(url, files=files)
+                        logger.debug(response.text)
+                        os.remove(download_res)
+                        logger.debug("File deleted")
                     if not m.message == '':
                         if everyone:
                             msgText = "@everyone {}".format(m.message)
