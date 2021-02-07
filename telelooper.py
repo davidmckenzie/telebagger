@@ -39,7 +39,7 @@ logger.setLevel(loglevel)
 
 print('Connecting to Telegram...')
 
-tclient = TelegramClient('session_name', api_id, api_hash, update_workers=4, spawn_read_thread=False)
+tclient = TelegramClient('session_name', api_id, api_hash)
 tclient.connect()
 if not tclient.is_user_authorized():
     tclient.send_code_request(phone)
