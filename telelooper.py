@@ -5,7 +5,7 @@
 ######
 
 from discord_hooks import Webhook
-from telethon import TelegramClient
+from telethon.sync import TelegramClient
 from telethon.tl.functions.messages import GetDialogsRequest, GetHistoryRequest
 from telethon.tl.functions.channels import GetFullChannelRequest
 from telethon.tl.functions.updates import GetChannelDifferenceRequest
@@ -35,9 +35,9 @@ try:
 except:
     logger.error('Error processing config file')
 
-logger.setLevel(loglevel)
+logger.setLevel("DEBUG")
 
-print('Connecting to Telegram...')
+print('Connecting to Telegram...',api_hash)
 
 tclient = TelegramClient('session_name', api_id, api_hash)
 tclient.connect()
@@ -53,10 +53,12 @@ result = tclient(GetDialogsRequest(
                  offset_date=last_date,
                  offset_id=0,
                  offset_peer=InputPeerEmpty(),
-                 limit=chunk_size
+                 limit=chunk_size,
+                 hash=1234
              ))
 pp.pprint(result)
 print("\nAvailable Channels:")
+print(result)
 for p in result.chats:
     if type(p) is Channel:
         print(str(p.id)+": "+p.title)
@@ -164,7 +166,7 @@ while True:
                         logger.debug("File deleted")
                     if not m.message == '':
                         if everyone:
-                            msgText = "@everyone {}".format(m.message)
+                            msgText = "everyone {}".format(m.message)
                         else:
                             msgText = "{}".format(m.message)
                         msg = Webhook(url,msg=msgText)
