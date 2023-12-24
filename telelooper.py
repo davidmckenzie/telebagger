@@ -1,3 +1,9 @@
+######
+#
+# Telelooper - Simple Telegram to Discord relay service, but this one loops once a second
+#
+######
+
 import asyncio
 from telethon import TelegramClient
 from telethon.tl.functions.messages import GetHistoryRequest
