@@ -40,10 +40,10 @@ logger.setLevel(loglevel)
 print('Connecting to Telegram...')
 
 tclient = TelegramClient('session_name', api_id, api_hash)
-tclient.connect()
-if not tclient.is_user_authorized():
-    tclient.send_code_request(phone)
-    myself = tclient.sign_in(phone, input('Enter code: '))
+await tclient.connect()
+if not await tclient.is_user_authorized():
+    await tclient.send_code_request(phone)
+    myself = await tclient.sign_in(phone, input('Enter code: '))
 
 lastmessage = 0
 last_date = None
@@ -53,7 +53,8 @@ result = tclient(GetDialogsRequest(
                  offset_date=last_date,
                  offset_id=0,
                  offset_peer=InputPeerEmpty(),
-                 limit=chunk_size
+                 limit=chunk_size,
+               hash=0
              ))
 pp.pprint(result)
 print("\nAvailable Channels:")
@@ -180,4 +181,9 @@ while True:
     except KeyboardInterrupt:
         break
 
-tclient.disconnect()
+await tclient.disconnect()
+
+
+if __name__ == '__main__':
+    import asyncio
+    asyncio.run(main())
